@@ -214,7 +214,7 @@ def LuoMessu(alkulaulu,paivanlaulu,ylistyslaulut,pyha,jumalankaritsa,ehtoollisla
     Metaslide(messu,'Ehtoollinen','Pyhä')
     SongSlide(messu, pyha, 'Pyhä')
     Metaslide(messu,'Ehtoollinen','Ehtoollisrukous')
-    SongSlide(messu, '', '')
+    InfoSlide(messu, '', '')
     SongSlide(messu, 'isä meidän', '')
     Metaslide(messu,'Ehtoollinen','Jumalan karitsa')
     InfoSlide(messu, kolinfo1, kolinfo2)
