@@ -105,7 +105,7 @@ class Metaslide(Slide):
         sections['Johdanto'] = ['Alkulaulu', 'Alkusanat ja seurakuntalaisen sana']
         sections['Sana'] = ['päivän laulu','evankeliumi','saarna','synnintunnustus','uskontunnustus']
         sections['Ylistys ja rukous'] = ['Ylistys- ja rukouslauluja','Esirukous']
-        sections['Ehtoollinen'] = ['Pyhä','Ehtoollisrukous','Ehtoollisen jako']
+        sections['Ehtoollinen'] = ['Pyhä','Ehtoollisrukous', 'Isä meidän', 'Jumalan karitsa', 'Ehtoollisen jako']
         sections['Siunaus ja lähettäminen'] = ['Herran siunaus','Loppusanat','Loppulaulu']
 
         self.text.insertString(self.cursor, '\n'*2, False) 	
@@ -188,6 +188,9 @@ def LuoMessu(alkulaulu,paivanlaulu,ylistyslaulut,pyha,jumalankaritsa,ehtoollisla
     plinfo1 = 'Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.' 
     plinfo2 = 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!'
 
+    kolinfo1 = 'Voit tulla ehtoolliselle jo Jumalan karitsa -hymnin aikana' 
+    kolinfo2 = 'Halutessasi voit jättää kolehdin ehtoolliselle tullessasi oikealla olevaan koriin.'
+
     messu = Presentation()
     #Johdanto
     Metaslide(messu,'Johdanto','Alkulaulu')
@@ -211,15 +214,17 @@ def LuoMessu(alkulaulu,paivanlaulu,ylistyslaulut,pyha,jumalankaritsa,ehtoollisla
     Metaslide(messu,'Ehtoollinen','Pyhä')
     SongSlide(messu, pyha, 'Pyhä')
     Metaslide(messu,'Ehtoollinen','Ehtoollisrukous')
+    SongSlide(messu, 'isä meidän', '')
+    Metaslide(messu,'Ehtoollinen','Jumalan karitsa')
+    InfoSlide(messu, kolinfo1, kolinfo2)
     SongSlide(messu, jumalankaritsa, '')
-    Metaslide(messu,'Ehtoollinen','Ehtoollisen jako')
     for ehtoollislaulu in ehtoollislaulut:
         SongSlide(messu, ehtoollislaulu, 'Ehtoollislauluja')
     #Lähettäminen
     Metaslide(messu,'Siunaus ja lähettäminen','Herran siunaus')
     Metaslide(messu,'Siunaus ja lähettäminen','Loppusanat')
     SongSlide(messu, loppulaulu, 'Loppulaulu')
-    print('Done. Muista lisätä evankeliumi!')
+    print('Done. Muista lisätä evankeliumi! ja kolehtidia..')
 
 
 def ExtractStructure(mailfile):
