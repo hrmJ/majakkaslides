@@ -220,6 +220,7 @@ def LuoMessu(alkulaulu,paivanlaulu,ylistyslaulut,pyha,jumalankaritsa,ehtoollisla
     InfoSlide(messu, kolinfo1, kolinfo2)
     SongSlide(messu, jumalankaritsa, '')
     for ehtoollislaulu in ehtoollislaulut:
+        InfoSlide(messu, '', '')
         SongSlide(messu, ehtoollislaulu, 'Ehtoollislauluja')
     #Lähettäminen
     Metaslide(messu,'Siunaus ja lähettäminen','Herran siunaus')
