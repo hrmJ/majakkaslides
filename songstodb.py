@@ -22,14 +22,16 @@ class Song(Base):
  
     id = Column(Integer, primary_key=True)
     title = Column(String)  
+    filename = Column(String)  
     sav = Column(String)  
     san = Column(String)  
     added = Column(Date)
 
-    def __init__(self, title='', sav='', san='', suomsan=''):
+    def __init__(self, filename, title='', sav='', san='', suomsan=''):
         self.title = title
         self.sav = sav
         self.san = san
+        self.filename = filename
         self.suomsan = suomsan
         self.added = datetime.datetime.today()
 
@@ -61,8 +63,11 @@ if __name__ == "__main__":
     Session = sessionmaker(bind=engine)
     session = Session()
 
+
+    i = 0
+    upcount = 0
     for songfile in glob.glob(songpath):
-        upcount = 0
+        i += 1
         if not 'laulut.txt' in songfile and not '_laulujen lista.txt' in songfile:
             with open(songfile,'r') as f:
                 laulu_raw = f.read()
@@ -82,12 +87,17 @@ if __name__ == "__main__":
                         sav = input('Sävel:')
                         san = input('Sanat:')
                         suomsan = input('Suom.sanat:')
-                    laulu = Song(thistitle,sav,san,suomsan)
+                    #strip slashes and file endings from filename
+                    fname = songfile[songfile.rfind('/')+1:]
+                    fname = fname[:-4]
+                    #new song object
+                    laulu = Song(fname, thistitle,sav,san,suomsan)
                     laulu.verses = []
                     for verse in verses[1:]:
                         laulu.verses.append(Verse(content=verse))
                     session.add(laulu)
                     upcount += 1
-        session.commit()
+                    print('{}/{}'.format(i,len(glob.glob(songpath))), end='\r')
+    session.commit()
 
     print('Done. Updated {} new songs.'.format(upcount))
