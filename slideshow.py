@@ -85,7 +85,7 @@ class Metaslide(Slide):
 
 
     def InsertSectionTitle(self, current):
-        sections = ['Johdanto','Sana','Ylistys ja rukous','Ehtoollinen','Lähettäminen']
+        sections = ['Johdanto','Sana','Ylistys ja rukous','Ehtoollinen','Siunaus ja lähettäminen']
         self.cursor.CharColor = CodeColor('white')
         self.cursor.CharHeight=11
         for num, sec in enumerate(sections):
