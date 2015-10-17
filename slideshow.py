@@ -12,6 +12,7 @@ from songstodb import Song, Verse
 import re
 from difflib import SequenceMatcher
 import menus
+import pysword
 
 engine = create_engine('sqlite:////home/juho/Dropbox/srk/laulut.db', echo=False)
 Base = declarative_base()
@@ -67,7 +68,6 @@ class Slide:
             self.cursor.CharPosture = NONE
         self.text.insertString(self.cursor, headertext + '\n',False) 	
 
-
 class InfoSlide(Slide):
     """Slides that give some general info"""
 
@@ -76,7 +76,6 @@ class InfoSlide(Slide):
         self.cursor.ParaLeftMargin = 0
         self.InsertHeader(infotext1,'yellow', True)
         self.InsertHeader(infotext2,'white', False)
-
 
 class Metaslide(Slide):
     """Slides that give information about the current stage of the service"""
@@ -120,6 +119,8 @@ class Metaslide(Slide):
                 title = '       ' + title
             self.text.insertString(self.cursor, title + '\n',False) 	
             self.cursor.CharColor = CodeColor('white')
+
+
 
 class SongSlide():
     """Song header + actual song"""
@@ -173,6 +174,14 @@ class PraiseSongSlide(SongSlide):
         InfoSlide(pres,ylinfo1,ylinfo2)
         super().__init__(pres, searched_filename, role, moreinfo='')
 
+def BibleSlide(pres, title, text):
+    headerslide = Slide(pres, False)
+    headerslide.InsertHeader(title,'yellow',True)
+    headerslide.InsertHeader(text.address, 'white')
+    for verse in text.verselist:
+        newslide = Slide(pres, False)
+        newslide.InsertHeader(verse, 'white')
+
 def CodeColor(color):
     if color == 'white':
         return 16777215
@@ -184,8 +193,7 @@ def LuoOtsikkodia(ThisComponent, yellowtext, whitetext):
     ThisComponent.DrawPages.insertNewByIndex(ThisComponent.DrawPages.Count)
 
 
-def LuoMessu(songs):
-
+def LuoMessu(songs,evankeliumi=None):
     plinfo1 = 'Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.' 
     plinfo2 = 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!'
 
@@ -194,44 +202,44 @@ def LuoMessu(songs):
 
     messu = Presentation()
     #Johdanto
-    Metaslide(messu,'Johdanto','Alkulaulu')
-    SongSlide(messu, songs['alkulaulu'], 'Alkulaulu')
-    Metaslide(messu,'Johdanto','Alkusanat ja seurakuntalaisen sana')
-    #Sana
-    Metaslide(messu,'Sana','päivän laulu')
-    InfoSlide(messu, plinfo1,plinfo2)
-    SongSlide(messu, songs['paivanlaulu'], 'Päivän laulu')
-    Metaslide(messu,'Sana','evankeliumi')
-    Metaslide(messu,'Sana','saarna')
-    Metaslide(messu,'Sana','synnintunnustus')
-    Metaslide(messu,'Sana','uskontunnustus')
-    SongSlide(messu, 'uskontunnustus', '')
-    #Rukous
-    Metaslide(messu,'Ylistys ja rukous','Ylistys- ja rukouslauluja')
-    for ylistyslaulu in songs['ylistyslaulut']:
-        PraiseSongSlide(messu, ylistyslaulu, 'Ylistys- ja rukouslauluja')
-    Metaslide(messu,'Ylistys ja rukous','Esirukous')
-    #Ehtoollinen
-    Metaslide(messu,'Ehtoollinen','Pyhä')
-    SongSlide(messu, songs['pyha'], 'Pyhä')
-    Metaslide(messu,'Ehtoollinen','Ehtoollisrukous')
-    InfoSlide(messu, '', '')
-    SongSlide(messu, 'isä meidän', '')
-    Metaslide(messu,'Ehtoollinen','Jumalan karitsa')
-    InfoSlide(messu, kolinfo1, kolinfo2)
-    SongSlide(messu, songs['jumalankaritsa'], '')
-    for ehtoollislaulu in songs['ehtoollislaulut']:
-        InfoSlide(messu, '', '')
-        SongSlide(messu, ehtoollislaulu, 'Ehtoollislauluja')
-    #Lähettäminen
-    Metaslide(messu,'Siunaus ja lähettäminen','Herran siunaus')
-    Metaslide(messu,'Siunaus ja lähettäminen','Loppusanat')
-    SongSlide(messu, songs['loppulaulu'], 'Loppulaulu')
+    #Metaslide(messu,'Johdanto','Alkulaulu')
+    #SongSlide(messu, songs['alkulaulu'], 'Alkulaulu')
+    #Metaslide(messu,'Johdanto','Alkusanat ja seurakuntalaisen sana')
+    ##Sana
+    #Metaslide(messu,'Sana','päivän laulu')
+    #InfoSlide(messu, plinfo1,plinfo2)
+    #SongSlide(messu, songs['paivanlaulu'], 'Päivän laulu')
+    #Metaslide(messu,'Sana','evankeliumi')
+    if evankeliumi:
+        BibleSlide(messu, 'Evankeliumi / raamatunkohta', evankeliumi)
+    #Metaslide(messu,'Sana','saarna')
+    #Metaslide(messu,'Sana','synnintunnustus')
+    #Metaslide(messu,'Sana','uskontunnustus')
+    #SongSlide(messu, 'uskontunnustus', '')
+    ##Rukous
+    #Metaslide(messu,'Ylistys ja rukous','Ylistys- ja rukouslauluja')
+    #for ylistyslaulu in songs['ylistyslaulut']:
+    #    PraiseSongSlide(messu, ylistyslaulu, 'Ylistys- ja rukouslauluja')
+    #Metaslide(messu,'Ylistys ja rukous','Esirukous')
+    ##Ehtoollinen
+    #Metaslide(messu,'Ehtoollinen','Pyhä')
+    #SongSlide(messu, songs['pyha'], 'Pyhä')
+    #Metaslide(messu,'Ehtoollinen','Ehtoollisrukous')
+    #InfoSlide(messu, '', '')
+    #SongSlide(messu, 'isä meidän', '')
+    #Metaslide(messu,'Ehtoollinen','Jumalan karitsa')
+    #InfoSlide(messu, kolinfo1, kolinfo2)
+    #SongSlide(messu, songs['jumalankaritsa'], '')
+    #for ehtoollislaulu in songs['ehtoollislaulut']:
+    #    InfoSlide(messu, '', '')
+    #    SongSlide(messu, ehtoollislaulu, 'Ehtoollislauluja')
+    ##Lähettäminen
+    #Metaslide(messu,'Siunaus ja lähettäminen','Herran siunaus')
+    #Metaslide(messu,'Siunaus ja lähettäminen','Loppusanat')
+    #SongSlide(messu, songs['loppulaulu'], 'Loppulaulu')
     print('Done. Muista lisätä evankeliumi! ja kolehtidia..')
 
-
 def ExtractStructure(mailfile):
-
     with open(mailfile,'r') as f:
         structure = f.read()
 
@@ -242,6 +250,15 @@ def ExtractStructure(mailfile):
 
     match = re.search(r'Päivän laulu: ?(.*)',structure)
     songs['paivanlaulu'] = match.group(1).strip()
+
+    match = re.search(r'evankeliumi: ?(.*)',structure.lower())
+    if match:
+        address = match.group(1).strip()
+        match = re.search(r'(\w+) (\d+):([0-9,-]+)',structure.lower())
+        book = match.group(1)
+        chapter = match.group(2)
+        verse = match.group(3)
+        evankeliumi = BibleText(book,chapter,verse,address)
 
     match = re.search(r'Ylistyslaulut.*\n ?--+\n(([a-öA-Ö].*\n)+)',structure)
     ylistyslaulut = match.group(1)
@@ -272,7 +289,7 @@ def ExtractStructure(mailfile):
 
     cont = menus.multimenu({'y':'yes','n':'no'}, 'All songs found in the database. Create slides?')
     if cont.answer == 'y':
-        LuoMessu(songs)
+        LuoMessu(songs, evankeliumi)
 
 def CheckAvailability(songname):
     """Check if this song is in the db and try to guess if not"""
@@ -302,6 +319,39 @@ def CheckAvailability(songname):
 
     return songname
 
+class BibleText:
+
+    def __init__(self, book, chapter, verse, finaddress=''):
+        self.address = input('kirjan nimi *' + book + '* suomeksi?\n>') + chapter + ': ' + verse
+        self.GetBibleText(book,chapter,verse)
+
+    def GetBibleText(self, book, chapter, verse):
+        """Get bible text from a sword module using the pysword library (https://github.com/kcarnold/pysword)"""
+        try:
+            module = pysword.ZModule('finpr92')
+        except:
+            sys.exit('Please set the path of the sword module in pysword.py')
+        text = ''
+        if '-' in verse:
+            verses = verse.split('-')
+            start = int(verses[0])
+            end = int(verses[1])
+            verses = range(start,end+1)
+            pair = ''
+            verselist = list()
+            for verse in verses:
+                if not pair:
+                    pair = module.text_for_ref(book, chapter, verse).decode("utf-8") + '\n'
+                else:
+                    pair += module.text_for_ref(book, chapter, verse).decode("utf-8") + '\n'
+                    verselist.append(pair)
+                    pair = ''
+            if pair:
+                # jos pariton märä jakeita
+                verselist.append(pair)
+        else:
+            verselist = [module.text_for_ref(book, chapter, verse).decode("utf-8")]
+        self.verselist = verselist
 
 
 if __name__ == "__main__":
