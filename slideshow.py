@@ -10,6 +10,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from songstodb import Song, Verse
 import re
+from difflib import SequenceMatcher
+import menus
 
 engine = create_engine('sqlite:////home/juho/Dropbox/srk/laulut.db', echo=False)
 Base = declarative_base()
@@ -154,7 +156,6 @@ class SongSlide():
             laulu = session.query(Song)
             searched_filename = searched_filename.lower()
             subquery = session.query(Song.id).filter(func.lower(Song.filename) == searched_filename).subquery()
-            #subquery = session.query(Song.id).filter(func.lower(Song.title).like('%{}%'.format(title))).subquery()
             query = session.query(Verse.content).filter(Verse.song_id.in_(subquery))
             self.sakeistot = query.all()
             title = session.query(Song.title).filter(func.lower(Song.filename) == searched_filename).first()
@@ -183,7 +184,7 @@ def LuoOtsikkodia(ThisComponent, yellowtext, whitetext):
     ThisComponent.DrawPages.insertNewByIndex(ThisComponent.DrawPages.Count)
 
 
-def LuoMessu(alkulaulu,paivanlaulu,ylistyslaulut,pyha,jumalankaritsa,ehtoollislaulut,loppulaulu):
+def LuoMessu(songs):
 
     plinfo1 = 'Päivän laulun aikana 3-6-vuotiaat lapset voivat siirtyä pyhikseen ja yli 6-vuotiaat klubiin.' 
     plinfo2 = 'Seuraa vetäjiä - tunnistat heidät lyhdyistä!'
@@ -194,12 +195,12 @@ def LuoMessu(alkulaulu,paivanlaulu,ylistyslaulut,pyha,jumalankaritsa,ehtoollisla
     messu = Presentation()
     #Johdanto
     Metaslide(messu,'Johdanto','Alkulaulu')
-    SongSlide(messu, alkulaulu, 'Alkulaulu')
+    SongSlide(messu, songs['alkulaulu'], 'Alkulaulu')
     Metaslide(messu,'Johdanto','Alkusanat ja seurakuntalaisen sana')
     #Sana
     Metaslide(messu,'Sana','päivän laulu')
     InfoSlide(messu, plinfo1,plinfo2)
-    SongSlide(messu, paivanlaulu, 'Päivän laulu')
+    SongSlide(messu, songs['paivanlaulu'], 'Päivän laulu')
     Metaslide(messu,'Sana','evankeliumi')
     Metaslide(messu,'Sana','saarna')
     Metaslide(messu,'Sana','synnintunnustus')
@@ -207,25 +208,25 @@ def LuoMessu(alkulaulu,paivanlaulu,ylistyslaulut,pyha,jumalankaritsa,ehtoollisla
     SongSlide(messu, 'uskontunnustus', '')
     #Rukous
     Metaslide(messu,'Ylistys ja rukous','Ylistys- ja rukouslauluja')
-    for ylistyslaulu in ylistyslaulut:
+    for ylistyslaulu in songs['ylistyslaulut']:
         PraiseSongSlide(messu, ylistyslaulu, 'Ylistys- ja rukouslauluja')
     Metaslide(messu,'Ylistys ja rukous','Esirukous')
     #Ehtoollinen
     Metaslide(messu,'Ehtoollinen','Pyhä')
-    SongSlide(messu, pyha, 'Pyhä')
+    SongSlide(messu, songs['pyha'], 'Pyhä')
     Metaslide(messu,'Ehtoollinen','Ehtoollisrukous')
     InfoSlide(messu, '', '')
     SongSlide(messu, 'isä meidän', '')
     Metaslide(messu,'Ehtoollinen','Jumalan karitsa')
     InfoSlide(messu, kolinfo1, kolinfo2)
-    SongSlide(messu, jumalankaritsa, '')
-    for ehtoollislaulu in ehtoollislaulut:
+    SongSlide(messu, songs['jumalankaritsa'], '')
+    for ehtoollislaulu in songs['ehtoollislaulut']:
         InfoSlide(messu, '', '')
         SongSlide(messu, ehtoollislaulu, 'Ehtoollislauluja')
     #Lähettäminen
     Metaslide(messu,'Siunaus ja lähettäminen','Herran siunaus')
     Metaslide(messu,'Siunaus ja lähettäminen','Loppusanat')
-    SongSlide(messu, loppulaulu, 'Loppulaulu')
+    SongSlide(messu, songs['loppulaulu'], 'Loppulaulu')
     print('Done. Muista lisätä evankeliumi! ja kolehtidia..')
 
 
@@ -234,30 +235,73 @@ def ExtractStructure(mailfile):
     with open(mailfile,'r') as f:
         structure = f.read()
 
-    match = re.search(r'Alkulaulu: (.*)',structure)
-    alkulaulu = match.group(1)
+    songs = dict()
 
-    match = re.search(r'Päivän laulu: (.*)',structure)
-    paivanlaulu = match.group(1)
+    match = re.search(r'Alkulaulu: ?(.*)',structure)
+    songs['alkulaulu'] = match.group(1).strip()
+
+    match = re.search(r'Päivän laulu: ?(.*)',structure)
+    songs['paivanlaulu'] = match.group(1).strip()
 
     match = re.search(r'Ylistyslaulut.*\n ?--+\n(([a-öA-Ö].*\n)+)',structure)
     ylistyslaulut = match.group(1)
-    ylistyslaulut = ylistyslaulut.splitlines()
+    songs['ylistyslaulut'] = ylistyslaulut.splitlines()
 
     match = re.search(r'Ehtoollislaulut.*\n ?--+\n(([a-öA-Ö].*\n)+)',structure)
     ehtoollislaulut = match.group(1)
-    ehtoollislaulut = ehtoollislaulut.splitlines()
+    songs['ehtoollislaulut'] = ehtoollislaulut.splitlines()
 
-    match = re.search(r'Pyhä-hymni: (.*)',structure)
-    pyha = match.group(1)
+    match = re.search(r'Pyhä-hymni: ?(.*)',structure)
+    songs['pyha'] = match.group(1).strip()
 
-    match = re.search(r'Jumalan karitsa: (.*)',structure)
-    jumalankaritsa = match.group(1)
+    match = re.search(r'Jumalan karitsa: ?(.*)',structure)
+    songs['jumalankaritsa'] = match.group(1).strip()
 
-    match = re.search(r'Loppulaulu: (.*)',structure)
-    loppulaulu = match.group(1)
+    match = re.search(r'Loppulaulu: ?(.*)',structure)
+    songs['loppulaulu'] = match.group(1).strip()
 
-    LuoMessu(alkulaulu,paivanlaulu,ylistyslaulut,pyha,jumalankaritsa,ehtoollislaulut,loppulaulu)
+    for songrole, songname in songs.items():
+        if songrole not in ('ylistyslaulut','ehtoollislaulut'):
+            songs[songrole] = CheckAvailability(songname)
+        else:
+            #ylistslaulut, ehtoollislaulut are lists that contain many song names
+            newsongnames = list()
+            for thissongname in songname:
+                newsongnames.append(CheckAvailability(thissongname))
+            songs[songrole] = newsongnames
+
+    cont = menus.multimenu({'y':'yes','n':'no'}, 'All songs found in the database. Create slides?')
+    if cont.answer == 'y':
+        LuoMessu(songs)
+
+def CheckAvailability(songname):
+    """Check if this song is in the db and try to guess if not"""
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    songname = songname.lower()
+
+    if not session.query(Song.filename).filter(func.lower(Song.filename) == songname).first():
+        allnames = session.query(Song.filename).all()
+        suggestions = dict()
+        for name in allnames:
+            simratio = SequenceMatcher(None, songname, name[0]).ratio()
+            suggestions[simratio] = name[0]
+        ratios = sorted(suggestions.keys())
+        ratios = ratios[-10:]
+        ratios = sorted(ratios[-10:],reverse=True)
+        suglist = dict()
+        for idx, ratio in enumerate(ratios):
+            suglist[str(idx)] = suggestions[ratio]
+        suglist['n'] = 'ei mikään näistä'
+        fuzzymenu = menus.multimenu(suglist, promptnow = 'Vastaako jokin näistä haettavaa laulua ({})?'.format(songname))
+        if fuzzymenu.answer != 'n':
+            return suglist[fuzzymenu.answer]
+        else:
+            sys.exit('Song "{}" not found. Exiting.'.format(songname))
+        print('False')
+
+    return songname
+
 
 
 if __name__ == "__main__":

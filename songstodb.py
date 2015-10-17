@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import datetime
+import natsort
 
 engine = create_engine('sqlite:////home/juho/Dropbox/srk/laulut.db', echo=False)
 Base = declarative_base()
@@ -62,12 +62,18 @@ if __name__ == "__main__":
 
     Session = sessionmaker(bind=engine)
     session = Session()
+    songnames = list()
 
 
     i = 0
     upcount = 0
     for songfile in glob.glob(songpath):
         i += 1
+        #strip slashes and file endings from filename
+        fname = songfile[songfile.rfind('/')+1:]
+        #!lowercase!
+        fname = fname[:-4].lower()
+        songnames.append(fname)
         if not 'laulut.txt' in songfile and not '_laulujen lista.txt' in songfile:
             with open(songfile,'r') as f:
                 laulu_raw = f.read()
@@ -87,9 +93,6 @@ if __name__ == "__main__":
                         sav = input('Sävel:')
                         san = input('Sanat:')
                         suomsan = input('Suom.sanat:')
-                    #strip slashes and file endings from filename
-                    fname = songfile[songfile.rfind('/')+1:]
-                    fname = fname[:-4]
                     #new song object
                     laulu = Song(fname, thistitle,sav,san,suomsan)
                     laulu.verses = []
@@ -99,5 +102,11 @@ if __name__ == "__main__":
                     upcount += 1
                     print('{}/{}'.format(i,len(glob.glob(songpath))), end='\r')
     session.commit()
+
+    #update the list of songs for the web app
+    songnames = natsort.natsorted(songnames)
+    with open('/home/juho/Dropbox/laulut/laulut.txt','w') as f:
+        f.write('\n'.join(songnames))
+
 
     print('Done. Updated {} new songs.'.format(upcount))
