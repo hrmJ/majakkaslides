@@ -202,42 +202,42 @@ def LuoMessu(songs,evankeliumi=None):
 
     messu = Presentation()
     #Johdanto
-    #Metaslide(messu,'Johdanto','Alkulaulu')
-    #SongSlide(messu, songs['alkulaulu'], 'Alkulaulu')
-    #Metaslide(messu,'Johdanto','Alkusanat ja seurakuntalaisen sana')
+    Metaslide(messu,'Johdanto','Alkulaulu')
+    SongSlide(messu, songs['alkulaulu'], 'Alkulaulu')
+    Metaslide(messu,'Johdanto','Alkusanat ja seurakuntalaisen sana')
     ##Sana
-    #Metaslide(messu,'Sana','päivän laulu')
-    #InfoSlide(messu, plinfo1,plinfo2)
-    #SongSlide(messu, songs['paivanlaulu'], 'Päivän laulu')
-    #Metaslide(messu,'Sana','evankeliumi')
+    Metaslide(messu,'Sana','päivän laulu')
+    InfoSlide(messu, plinfo1,plinfo2)
+    SongSlide(messu, songs['paivanlaulu'], 'Päivän laulu')
+    Metaslide(messu,'Sana','evankeliumi')
     if evankeliumi:
         BibleSlide(messu, 'Evankeliumi / raamatunkohta', evankeliumi)
-    #Metaslide(messu,'Sana','saarna')
-    #Metaslide(messu,'Sana','synnintunnustus')
-    #Metaslide(messu,'Sana','uskontunnustus')
-    #SongSlide(messu, 'uskontunnustus', '')
+    Metaslide(messu,'Sana','saarna')
+    Metaslide(messu,'Sana','synnintunnustus')
+    Metaslide(messu,'Sana','uskontunnustus')
+    SongSlide(messu, 'uskontunnustus', '')
     ##Rukous
-    #Metaslide(messu,'Ylistys ja rukous','Ylistys- ja rukouslauluja')
-    #for ylistyslaulu in songs['ylistyslaulut']:
-    #    PraiseSongSlide(messu, ylistyslaulu, 'Ylistys- ja rukouslauluja')
-    #Metaslide(messu,'Ylistys ja rukous','Esirukous')
-    ##Ehtoollinen
-    #Metaslide(messu,'Ehtoollinen','Pyhä')
-    #SongSlide(messu, songs['pyha'], 'Pyhä')
-    #Metaslide(messu,'Ehtoollinen','Ehtoollisrukous')
-    #InfoSlide(messu, '', '')
-    #SongSlide(messu, 'isä meidän', '')
-    #Metaslide(messu,'Ehtoollinen','Jumalan karitsa')
-    #InfoSlide(messu, kolinfo1, kolinfo2)
-    #SongSlide(messu, songs['jumalankaritsa'], '')
-    #for ehtoollislaulu in songs['ehtoollislaulut']:
-    #    InfoSlide(messu, '', '')
-    #    SongSlide(messu, ehtoollislaulu, 'Ehtoollislauluja')
-    ##Lähettäminen
-    #Metaslide(messu,'Siunaus ja lähettäminen','Herran siunaus')
-    #Metaslide(messu,'Siunaus ja lähettäminen','Loppusanat')
-    #SongSlide(messu, songs['loppulaulu'], 'Loppulaulu')
-    print('Done. Muista lisätä evankeliumi! ja kolehtidia..')
+    Metaslide(messu,'Ylistys ja rukous','Ylistys- ja rukouslauluja')
+    for ylistyslaulu in songs['ylistyslaulut']:
+        PraiseSongSlide(messu, ylistyslaulu, 'Ylistys- ja rukouslauluja')
+    Metaslide(messu,'Ylistys ja rukous','Esirukous')
+    #Ehtoollinen
+    Metaslide(messu,'Ehtoollinen','Pyhä')
+    SongSlide(messu, songs['pyha'], 'Pyhä')
+    Metaslide(messu,'Ehtoollinen','Ehtoollisrukous')
+    InfoSlide(messu, '', '')
+    SongSlide(messu, 'isä meidän', '')
+    Metaslide(messu,'Ehtoollinen','Jumalan karitsa')
+    InfoSlide(messu, kolinfo1, kolinfo2)
+    SongSlide(messu, songs['jumalankaritsa'], '')
+    for ehtoollislaulu in songs['ehtoollislaulut']:
+        InfoSlide(messu, '', '')
+        SongSlide(messu, ehtoollislaulu, 'Ehtoollislauluja')
+    #Lähettäminen
+    Metaslide(messu,'Siunaus ja lähettäminen','Herran siunaus')
+    Metaslide(messu,'Siunaus ja lähettäminen','Loppusanat')
+    SongSlide(messu, songs['loppulaulu'], 'Loppulaulu')
+    print('Done. Muista otsikko, kolehtidia ja...')
 
 def ExtractStructure(mailfile):
     with open(mailfile,'r') as f:
