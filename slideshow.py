@@ -254,7 +254,7 @@ def ExtractStructure(mailfile):
     match = re.search(r'evankeliumi: ?(.*)',structure.lower())
     if match:
         address = match.group(1).strip()
-        match = re.search(r'(\w+) (\d+):([0-9,-]+)',structure.lower())
+        match = re.search(r'(\d?\w+) (\d+):([0-9,-]+)',structure.lower())
         book = match.group(1)
         chapter = match.group(2)
         verse = match.group(3)
