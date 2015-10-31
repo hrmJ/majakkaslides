@@ -82,7 +82,7 @@ if __name__ == "__main__":
                 verses = re.split('\n{2,}',laulu_raw)
                 thistitle = verses[0]
                 res = None
-                res = session.query(Song.title).filter(Song.title==thistitle).first()
+                res = session.query(Song.filename).filter(Song.filename==fname).first()
                 if not res and 'euvonen' not in thistitle and 'suom. san' not in thistitle:
                     #If no previous song by this name
                     sav = ''
