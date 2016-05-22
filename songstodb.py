@@ -83,16 +83,16 @@ if __name__ == "__main__":
                 thistitle = verses[0]
                 res = None
                 res = session.query(Song.filename).filter(Song.filename==fname).first()
-                if not res and 'euvonen' not in thistitle and 'suom. san' not in thistitle:
-                    #If no previous song by this name
+                #If no previous song by this name
+                if not res:
                     sav = ''
                     san = ''
                     suomsan = ''
-                    if "säv" in thistitle and "san" in thistitle:
-                        thistitle = input('Varmista laulun nimi: {}\n>'.format(thistitle))
-                        sav = input('Sävel:')
-                        san = input('Sanat:')
-                        suomsan = input('Suom.sanat:')
+                    #if "säv" in thistitle and "san" in thistitle:
+                    #    thistitle = input('Varmista laulun nimi: {}\n>'.format(thistitle))
+                    #    sav = input('Sävel:')
+                    #    san = input('Sanat:')
+                    #    suomsan = input('Suom.sanat:')
                     #new song object
                     laulu = Song(fname, thistitle,sav,san,suomsan)
                     laulu.verses = []
@@ -100,7 +100,7 @@ if __name__ == "__main__":
                         laulu.verses.append(Verse(content=verse))
                     session.add(laulu)
                     upcount += 1
-                    print('{}/{}'.format(i,len(glob.glob(songpath))), end='\r')
+                print('{}/{}'.format(i,len(glob.glob(songpath))), end='\r')
     session.commit()
 
     #update the list of songs for the web app
